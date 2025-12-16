@@ -22,15 +22,38 @@ jobs:
         # Homebrew is pre-installed on macOS runners
         brew --version
 
-    - name: Install Claude Code via Homebrew
+    - name: Check and Install Claude Code
       run: |
-        # Install Claude Code
-        brew install --cask claude-code
+        # Check if Claude Code is already installed
+        if command -v claude &> /dev/null; then
+          echo "Claude Code is already installed!"
+          echo "Version: $(claude -version 2>/dev/null || echo 'Unable to get version')"
+          echo "Location: $(which claude)"
+        elif command -v claude-code &> /dev/null; then
+          echo "Claude Code (as claude-code) is already installed!"
+          echo "Version: $(claude-code --version 2>/dev/null || echo 'Unable to get version')"
+          echo "Location: $(which claude-code)"
+        elif [ -d "/Applications/Claude.app" ] || [ -d "/Applications/Claude Code.app" ]; then
+          echo "Claude Code app found in /Applications directory"
+          echo "Checking for binary in app bundle..."
+          find /Applications -name "claude" -type f 2>/dev/null | head -5 || echo "No claude binary found in app bundles"
+        else
+          echo "Claude Code not found. Installing via Homebrew..."
+          # Install Claude Code
+          brew install --cask claude-code
 
-        # Verify installation
-        echo "Checking if claude-code is available..."
-        which claude-code
-        claude-code --version || echo "Version check failed, but installation might have succeeded"
+          # Verify installation
+          echo "Checking if claude-code is available after installation..."
+          if command -v claude-code &> /dev/null; then
+            echo "Claude Code successfully installed!"
+            which claude-code
+            claude-code --version || echo "Version check failed, but installation might have succeeded"
+          else
+            echo "Installation completed, but claude-code command not found in PATH"
+            echo "Checking app bundles..."
+            find /Applications -name "*Claude*" -type d 2>/dev/null
+          fi
+        fi
 
     - name: Run Claude Code command
       env:
@@ -56,5 +79,5 @@ jobs:
         export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
         export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 
-        # Run claude with the message
-        claude "$@" -p "${{ github.event.inputs.message }}"
+        # Run claude -version
+        claude -version
