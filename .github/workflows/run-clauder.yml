@@ -1,37 +1,38 @@
-name: Run Clauder Command
+name: Run Claude Code Command
 
 on:
   workflow_dispatch:
     inputs:
       message:
-        description: 'Message to send to clauder'
+        description: 'Message to send to claude-code'
         required: true
         default: 'hai apa kabar'
         type: string
 
 jobs:
-  run-clauder:
-    runs-on: ubuntu-latest
+  run-claude-code:
+    runs-on: macos-latest  # Changed to macOS since we need Homebrew
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-
-    - name: Install clauder (if needed)
+    - name: Setup Homebrew
       run: |
-        # Check if clauder is installed
-        if ! command -v clauder &> /dev/null; then
-          echo "Clauder not found. Please install it first or add installation steps here."
-          echo "You can add installation commands like: npm install -g clauder"
-          exit 1
-        fi
+        # Homebrew is pre-installed on macOS runners
+        brew --version
 
-    - name: Run clauder command
+    - name: Install Claude Code via Homebrew
       run: |
-        echo "Running: clauder -p \"${{ github.event.inputs.message }}\""
-        clauder -p "${{ github.event.inputs.message }}"
+        # Install Claude Code
+        brew install --cask claude-code
+
+        # Verify installation
+        echo "Checking if claude-code is available..."
+        which claude-code
+        claude-code --version || echo "Version check failed, but installation might have succeeded"
+
+    - name: Run Claude Code command
+      run: |
+        echo "Running: claude-code -p \"${{ github.event.inputs.message }}\""
+        claude-code -p "${{ github.event.inputs.message }}"
