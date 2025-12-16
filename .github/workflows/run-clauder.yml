@@ -1,0 +1,37 @@
+name: Run Clauder Command
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Message to send to clauder'
+        required: true
+        default: 'hai apa kabar'
+        type: string
+
+jobs:
+  run-clauder:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install clauder (if needed)
+      run: |
+        # Check if clauder is installed
+        if ! command -v clauder &> /dev/null; then
+          echo "Clauder not found. Please install it first or add installation steps here."
+          echo "You can add installation commands like: npm install -g clauder"
+          exit 1
+        fi
+
+    - name: Run clauder command
+      run: |
+        echo "Running: clauder -p \"${{ github.event.inputs.message }}\""
+        clauder -p "${{ github.event.inputs.message }}"
