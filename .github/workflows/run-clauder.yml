@@ -65,5 +65,5 @@ jobs:
         export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
         export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 
-        # Run claude -version
-        claude -version
+        # Run claude with the message
+        claude "$@" -p "${{ github.event.inputs.message }}"
