@@ -24,35 +24,21 @@ jobs:
 
     - name: Check and Install Claude Code
       run: |
-        # Check if Claude Code is already installed
-        if command -v claude &> /dev/null; then
-          echo "Claude Code is already installed!"
+        # Check if Claude Code is already installed using which
+        if which claude &> /dev/null; then
+          echo "Claude Code is already installed at: $(which claude)"
           echo "Version: $(claude -version 2>/dev/null || echo 'Unable to get version')"
-          echo "Location: $(which claude)"
-        elif command -v claude-code &> /dev/null; then
-          echo "Claude Code (as claude-code) is already installed!"
+        elif which claude-code &> /dev/null; then
+          echo "Claude Code is already installed at: $(which claude-code)"
           echo "Version: $(claude-code --version 2>/dev/null || echo 'Unable to get version')"
-          echo "Location: $(which claude-code)"
-        elif [ -d "/Applications/Claude.app" ] || [ -d "/Applications/Claude Code.app" ]; then
-          echo "Claude Code app found in /Applications directory"
-          echo "Checking for binary in app bundle..."
-          find /Applications -name "claude" -type f 2>/dev/null | head -5 || echo "No claude binary found in app bundles"
         else
           echo "Claude Code not found. Installing via Homebrew..."
           # Install Claude Code
           brew install --cask claude-code
 
           # Verify installation
-          echo "Checking if claude-code is available after installation..."
-          if command -v claude-code &> /dev/null; then
-            echo "Claude Code successfully installed!"
-            which claude-code
-            claude-code --version || echo "Version check failed, but installation might have succeeded"
-          else
-            echo "Installation completed, but claude-code command not found in PATH"
-            echo "Checking app bundles..."
-            find /Applications -name "*Claude*" -type d 2>/dev/null
-          fi
+          echo "Checking installation..."
+          which claude-code && echo "Claude Code successfully installed at: $(which claude-code)" || echo "Installation may have completed but binary not found in PATH"
         fi
 
     - name: Run Claude Code command
