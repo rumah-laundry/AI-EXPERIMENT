@@ -65,6 +65,5 @@ jobs:
         export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
         export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 
-        # Store claude output in variable and display it
+        # Store claude output in variable
         VARIABLE_COMMAND=$(claude "$@" -p "${{ github.event.inputs.message }}")
-        echo "$VARIABLE_COMMAND"
