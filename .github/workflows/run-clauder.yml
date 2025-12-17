@@ -80,7 +80,7 @@ jobs:
         echo "Base URL: ${ANTHROPIC_BASE_URL:-Not set (using default in function)}"
 
         # Store clauders output in variable
-        VARIABLE_COMMAND=$(clauders -p "${{ github.event.inputs.message }}" 2>&1)
+        VARIABLE_COMMAND=$(clauders -p "hei lagi apa brow" | tee hasil.txt)
 
         # Check if command succeeded
         if [ $? -eq 0 ]; then
