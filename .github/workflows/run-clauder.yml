@@ -85,8 +85,8 @@ jobs:
         # Check if command succeeded
         if [ $? -eq 0 ]; then
           echo "Command executed successfully"
-          # Uncomment the line below to see the output
-          # echo "Output: $VARIABLE_COMMAND"
+          echo "Output:"
+          echo "$VARIABLE_COMMAND"
         else
           echo "Command failed with output:"
           echo "$VARIABLE_COMMAND"
