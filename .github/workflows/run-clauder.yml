@@ -80,14 +80,15 @@ jobs:
         echo "Base URL: ${ANTHROPIC_BASE_URL:-Not set (using default in function)}"
 
         # Store clauders output in variable
-        clauders -p "hei lagi apa brow" | tee hasil.txt
+        VARIABLE_COMMAND=$(clauders -p "hei lagi apa brow")
 
         # Check if command succeeded
         if [ $? -eq 0 ]; then
           echo "Command executed successfully"
           # Uncomment the line below to see the output
-          # echo "Output"
+          echo "Output: $VARIABLE_COMMAND"
         else
           echo "Command failed with output:"
+          echo "$VARIABLE_COMMAND"
           exit 1
         fi
