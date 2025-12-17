@@ -43,7 +43,7 @@ jobs:
 
     - name: Run Claude Code command
       env:
-        ANTHROPIC_BASE_URL: http://localhost:4141
+        ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
         ANTHROPIC_AUTH_TOKEN: dummyhai
         ANTHROPIC_MODEL: claude-opus-4.5
         ANTHROPIC_DEFAULT_SONNET_MODEL: claude-sonnet-4.5
@@ -56,7 +56,7 @@ jobs:
         echo "Message: ${{ github.event.inputs.message }}"
 
         # Export environment variables and run claude command
-        export ANTHROPIC_BASE_URL=http://localhost:4141
+        export ANTHROPIC_BASE_URL=${{ secrets.ANTHROPIC_BASE_URL }}
         export ANTHROPIC_AUTH_TOKEN=dummyhai
         export ANTHROPIC_MODEL=claude-opus-4.5
         export ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4.5
