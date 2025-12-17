@@ -41,29 +41,54 @@ jobs:
           which claude-code && echo "Claude Code successfully installed at: $(which claude-code)" || echo "Installation may have completed but binary not found in PATH"
         fi
 
-    - name: Run Claude Code command
+    - name: Setup Clauders Function
+      run: |
+        # Create clauders function with all environment variables
+        cat << 'EOF' >> ~/.bashrc
+
+        # Clauders function with pre-configured environment variables
+        clauders() {
+            # Set environment variables
+            export ANTHROPIC_BASE_URL="${ANTHROPIC_BASE_URL:-${{ secrets.ANTHROPIC_BASE_URL }}}"
+            export ANTHROPIC_AUTH_TOKEN="${ANTHROPIC_AUTH_TOKEN:-dummyhai}"
+            export ANTHROPIC_MODEL="${ANTHROPIC_MODEL:-claude-opus-4.5}"
+            export ANTHROPIC_DEFAULT_SONNET_MODEL="${ANTHROPIC_DEFAULT_SONNET_MODEL:-claude-sonnet-4.5}"
+            export ANTHROPIC_SMALL_FAST_MODEL="${ANTHROPIC_SMALL_FAST_MODEL:-gemini-2.5-pro}"
+            export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-claude-haiku-4.5}"
+            export DISABLE_NON_ESSENTIAL_MODEL_CALLS="${DISABLE_NON_ESSENTIAL_MODEL_CALLS:-1}"
+            export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="${CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC:-1}"
+
+            # Run claude with all arguments passed to the function
+            claude "$@"
+        }
+        EOF
+
+        # Source the bashrc to load the function
+        source ~/.bashrc
+
+        # Verify function is loaded
+        type clauders
+
+    - name: Run Clauders Function
       env:
         ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-        ANTHROPIC_AUTH_TOKEN: dummyhai
-        ANTHROPIC_MODEL: claude-opus-4.5
-        ANTHROPIC_DEFAULT_SONNET_MODEL: claude-sonnet-4.5
-        ANTHROPIC_SMALL_FAST_MODEL: gemini-2.5-pro
-        ANTHROPIC_DEFAULT_HAIKU_MODEL: claude-haiku-4.5
-        DISABLE_NON_ESSENTIAL_MODEL_CALLS: 1
-        CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: 1
       run: |
-        echo "Running: claude with environment variables"
-        echo "Message: ${{ github.event.inputs.message }}"
+        echo "Loading clauders function..."
+        source ~/.bashrc
 
-        # Export environment variables and run claude command
-        export ANTHROPIC_BASE_URL=${{ secrets.ANTHROPIC_BASE_URL }}
-        export ANTHROPIC_AUTH_TOKEN=dummyhai
-        export ANTHROPIC_MODEL=claude-opus-4.5
-        export ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4.5
-        export ANTHROPIC_SMALL_FAST_MODEL=gemini-2.5-pro
-        export ANTHROPIC_DEFAULT_HAIKU_MODEL=claude-haiku-4.5
-        export DISABLE_NON_ESSENTIAL_MODEL_CALLS=1
-        export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+        echo "Running: clauders -p \"${{ github.event.inputs.message }}\""
+        echo "Base URL: ${ANTHROPIC_BASE_URL:-Not set (using default in function)}"
 
-        # Store claude output in variable
-        VARIABLE_COMMAND=$(claude "$@" -p "${{ github.event.inputs.message }}")
+        # Store clauders output in variable
+        VARIABLE_COMMAND=$(clauders -p "${{ github.event.inputs.message }}" 2>&1)
+
+        # Check if command succeeded
+        if [ $? -eq 0 ]; then
+          echo "Command executed successfully"
+          # Uncomment the line below to see the output
+          # echo "Output: $VARIABLE_COMMAND"
+        else
+          echo "Command failed with output:"
+          echo "$VARIABLE_COMMAND"
+          exit 1
+        fi
